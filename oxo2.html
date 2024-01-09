@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tic tac toe game</title>
+    <style>
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1d1e22;
+            margin-top: -10px;
+            padding: 23px 0;
+            color: whitesmoke;
+            font-family: "Asap", sans-serif;
+            opacity: 0.8;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            background-color: blue;
+            background: linear-gradient(-45deg,
+                    #ee7752,
+                    #e73c7e,
+                    #23a6d5,
+                    #23d5ab,
+                    #333642);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: -22px;
+            padding: 15px 5px;
+            border: 2px solid #333642;
+            border-width: 5px 650px;
+            color: #333642;
+            font-family: "Asap", sans-serif;
+            font-size: 30px;
+        }
+
+        .user {
+            background-color: red;
+            position: relative;
+            left: -90px;
+            font-size: 18px;
+        }
+
+        .user2 {
+            background-color: red;
+            position: relative;
+            right: -95px;
+            font-size: 18px;
+        }
+
+        .userInput {
+            font-weight: bold;
+            font-family: "Asap", sans-serif;
+            position: absolute;
+            left: 200px;
+            top: 105px;
+            font-size: 25px;
+            color: red;
+        }
+
+        .user2Input {
+            font-weight: bold;
+            font-family: "Asap", sans-serif;
+            position: absolute;
+            right: 200px;
+            top: 105px;
+            font-size: 25px;
+            color: red;
+        }
+
+        .button-container {
+            width: 520px;
+            background-color: aqua;
+            overflow-y: auto;
+        }
+
+        .menu-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            float: left;
+            background: lightgray;
+            margin: 15px;
+            border: 1.5px solid black;
+            text-align: center;
+            font-size: 75px;
+        }
+
+        .cell:hover {
+            background-color: gray;
+        }
+
+        .game--restart:hover {
+            background-color: blue;
+            background: linear-gradient(-45deg, #141518, #989798, #dcdedc, #fff);
+            background-size: 400% 400%;
+            animation: gradient 5s ease infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="header">Tic Tac Toe Game</h1>
+
+    <span class="userInput" id="user"></span>
+    <div class="scoreboard" id="score">
+        <span class="user">User</span>
+        0:0
+        <span class="user2">User2</span>
+    </div>
+    <span class="user2Input" id="user2"></span>
+
+    <div class="menu-container">
+        <div class="button-container">
+            <div class="row">
+                <div data-cell-index="0" class="cell"></div>
+                <div data-cell-index="1" class="cell"></div>
+                <div data-cell-index="2" class="cell"></div>
+            </div>
+            <div class="row">
+                <div data-cell-index="3" class="cell"></div>
+                <div data-cell-index="4" class="cell"></div>
+                <div data-cell-index="5" class="cell"></div>
+            </div>
+            <div class="row">
+                <div data-cell-index="6" class="cell"></div>
+                <div data-cell-index="7" class="cell"></div>
+                <div data-cell-index="8" class="cell"></div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <button class="game--restart">Start a new Game</button>
+</body>
+<script>
+    const statusDisplay = document.querySelector(".header");
+    let score = document.getElementById("score");
+
+    let gameActive = true;
+    let currentPlayer = "X";
+    let XPoint = 0;
+    let OPoint = 0;
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+
+    const winningMessage = () => `Player ${currentPlayer} has won!`;
+    const drawMessage = () => `Game ended in a draw!`;
+    const currentPlayerTurn = () => `It's ${currentPlayer}'s turn`;
+
+    setTimeout(function () {
+        statusDisplay.innerHTML = currentPlayerTurn();
+    }, 2500);
+
+    const winningConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+
+    function handleCellPlayed(clickedCell, clickedCellIndex) {
+        gameState[clickedCellIndex] = currentPlayer;
+        clickedCell.innerHTML = currentPlayer;
+    }
+
+    function handlePlayerChange() {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusDisplay.innerHTML = currentPlayerTurn();
+    }
+
+    function handleResultValidation() {
+        let roundWon = false;
+        for (let i = 0; i <= 7; i++) {
+            const winCondition = winningConditions[i];
+            let a = gameState[winCondition[0]];
+            let b = gameState[winCondition[1]];
+            let c = gameState[winCondition[2]];
+            if (a === "" || b === "" || c === "") {
+                continue;
+            }
+            if (a === b && b === c) {
+                roundWon = true;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            statusDisplay.innerHTML = winningMessage();
+            if (currentPlayer == "X") {
+                XPoint++;
+                score.innerHTML = XPoint.toString() + " : " + OPoint.toString();
+            } else {
+                OPoint++;
+                score.innerHTML = XPoint.toString() + " : " + OPoint.toString();
+            }
+            gameActive = false;
+            return;
+        }
+
+        let roundDraw = !gameState.includes("");
+        if (roundDraw) {
+            statusDisplay.innerHTML = drawMessage();
+            gameActive = false;
+            return;
+        }
+
+        handlePlayerChange();
+    }
+
+    function handleCellClick(clickedCellEvent) {
+        const clickedCell = clickedCellEvent.target;
+        const clickedCellIndex = parseInt(clickedCell.getAttribute("data-cell-index"));
+
+        if (gameState[clickedCellIndex] !== "" || !gameActive) {
+            return;
+        }
+
+        handleCellPlayed(clickedCell, clickedCellIndex);
+        handleResultValidation();
+    }
+
+    function handleRestartGame() {
+        gameActive = true;
+        currentPlayer = "X";
+        gameState = ["", "", "", "", "", "", "", "", ""];
+        setTimeout(function () {
+            statusDisplay.innerHTML = currentPlayerTurn();
+        }, 2000);
+        statusDisplay.innerHTML = "New game started!";
+        document.querySelectorAll(".cell").forEach((cell) => (cell.innerHTML = ""));
+    }
+
+    document
+        .querySelectorAll(".cell")
+        .forEach((cell) => cell.addEventListener("click", handleCellClick));
+    document
+        .querySelector(".game--restart")
+        .addEventListener("click", handleRestartGame);
+
+</script>
+
+</html>
